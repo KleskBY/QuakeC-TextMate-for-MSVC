@@ -1,0 +1,219 @@
+{
+	"fileTypes": [
+		"qc",
+	],
+	"firstLineMatch": "-[*]-( Mode:)? C -[*]-",
+	"keyEquivalent": "^~C",
+	"name": "QuakeC",
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+    {
+      "name": "string.quoted.double.quake",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.quake",
+          "match": "\\\\[0-7]{3}|\\\\[\\\\fnrt\\\"\\']"
+        }
+      ]
+    },
+    {
+      "name": "string.quoted.single.quake",
+      "begin": "\'",
+      "end": "\'",
+      "patterns": [
+        {
+          "name": "constant.character.escape.quake",
+          "match": "\\\\[0-7]{3}|\\\\[\\\\fnrt\\\"\\']"
+        }
+      ]
+    },
+		{
+			"match": "\\b(break|case|continue|default|do|else|for|goto|if|_Pragma|return|switch|while)\\b",
+			"name": "keyword.control.qc"
+		},
+		{
+      "match": "\\b(entity|float|string|bool|class|vector|__variant|enum|enumflags|int|long|short|struct|typedef|union|void)\\b",
+			"name": "entity.name"
+		},
+		{
+			"match": "\\b(const|var|__unused|noref|__used|local|static|nonstatic|nosave|inline|strip|__ignore|shared|optional|__inout|__in|__out|__weak|__wrap|__accumulate)\\b",
+			"name": "entity.name"
+		},
+		{
+			"match": "\\b(NULL|true|false|TRUE|FALSE)\\b",
+			"name": "constant.language.qc"
+		},
+    {
+			"match": "\\b[0-9A-Z_]+[_]+[0-9A-Z]*\\b",
+			"name": "constant.language.qc"
+		},
+    {
+      "name": "constant.numeric.integer.qc",
+      "match": "\\b[0-9]+\\b"
+    },
+    {
+			"match": "([&*<>+=-])",
+			"name": "constant.numeric..operator.qc"
+		},
+    {
+      "match": "([a-zA-Z_{1}][a-zA-Z0-9_]+)(?=\\()",
+      "name": "constant.numeric.qc"
+    },
+		{
+			"begin": "^\\s*#\\s*(define|defined|elif|endif|else|if|ifdef|ifndef|line|pragma|undef)\\b",
+			"captures": {
+				"1": {
+					"name": "keyword.control.import.c"
+				}
+			},
+			"end": "(?=(?://|/\\*))|$",
+			"name": "meta.preprocessor.c",
+			"patterns": [
+				{
+					"match": "(?>\\\\\\s*\\n)",
+					"name": "punctuation.separator.continuation.c"
+				}
+			]
+		},
+	],
+	"repository": {
+		"block": {
+			"patterns": [
+				{
+					"begin": "\\{",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.section.block.begin.c"
+						}
+					},
+					"end": "\\}",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.section.block.end.c"
+						}
+					},
+					"name": "meta.block.c",
+					"patterns": [
+						{
+							"include": "#block_innards"
+						}
+					]
+				}
+			]
+		},
+		"block_innards": {
+			"patterns": [
+				{
+					"include": "#c_function_call"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "variable.other.c"
+						},
+						"2": {
+							"name": "punctuation.definition.parameters.c"
+						}
+					},
+					"match": "(?x)\n\t\t\t        (?x)\n\t\t\t(?:  \n\t\t\t     (?: (?= \\s )           (?<!else|new|return) (?<=\\w)\\s+      #  or word + space before name\n\t\t\t     )\n\t\t\t)\n\t\t\t(\n\t\t\t\t(?: [A-Za-z_][A-Za-z0-9_]*+ | :: )++    |              # actual name\n\t\t\t\t(?: (?<=operator) (?: [-*&<>=+!]+ | \\(\\) | \\[\\] ) )?  # if it is a C++ operator\n\t\t\t)\n\t\t\t \\s*(\\()",
+					"name": "meta.initialization.c"
+				},
+				{
+					"include": "#block"
+				},
+				{
+					"include": "$base"
+				}
+			]
+		},
+		"c_function_call": {
+			"captures": {
+				"1": {
+					"name": "punctuation.whitespace.function-call.leading.c"
+				},
+				"2": {
+					"name": "support.function.any-method.c"
+				},
+				"3": {
+					"name": "punctuation.definition.parameters.c"
+				}
+			},
+			"match": "(?x) (?: (?= \\s )  (?:(?<=else|new|return) | (?<!\\w)) (\\s+))?\n\t\t\t(\\b \n\t\t\t\t(?!(while|for|do|if|else|switch|catch|enumerate|return|sizeof|[cr]?iterate)\\s*\\()(?:(?!NS)[A-Za-z_][A-Za-z0-9_]*+\\b | :: )++                  # actual name\n\t\t\t)\n\t\t\t \\s*(\\()",
+			"name": "meta.function-call.c"
+		},
+		"comments": {
+			"patterns": [
+				{
+					"captures": {
+						"1": {
+							"name": "meta.toc-list.banner.block.c"
+						}
+					},
+					"match": "^/\\* =(\\s*.*?)\\s*= \\*/$\\n?",
+					"name": "comment.block.c"
+				},
+				{
+					"begin": "/\\*",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.begin.c"
+						}
+					},
+					"end": "\\*/",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.comment.end.c"
+						}
+					},
+					"name": "comment.block.c"
+				},
+				{
+					"match": "\\*/.*\\n",
+					"name": "invalid.illegal.stray-comment-end.c"
+				},
+				{
+					"captures": {
+						"1": {
+							"name": "meta.toc-list.banner.line.c"
+						}
+					},
+					"match": "^// =(\\s*.*?)\\s*=\\s*$\\n?",
+					"name": "comment.line.banner.c++"
+				},
+				{
+					"begin": "(^[ \\t]+)?(?=//)",
+					"beginCaptures": {
+						"1": {
+							"name": "punctuation.whitespace.comment.leading.c++"
+						}
+					},
+					"end": "(?!\\G)",
+					"patterns": [
+						{
+							"begin": "//",
+							"beginCaptures": {
+								"0": {
+									"name": "punctuation.definition.comment.c++"
+								}
+							},
+							"end": "\\n",
+							"name": "comment.line.double-slash.c++",
+							"patterns": [
+								{
+									"match": "(?>\\\\\\s*\\n)",
+									"name": "punctuation.separator.continuation.c++"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		
+	},
+	"scopeName": "source.qc"
+}
